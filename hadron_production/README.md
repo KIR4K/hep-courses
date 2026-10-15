@@ -114,7 +114,7 @@ Where
 $R_{CP}$ is similar to $R_{AB}$, but it is calculated using the yields from the same collision system (hence the CP in the name - central to peripheral):
 
 ```math
-R_{AB} = \frac{N_{coll}^{peripheral}}{N_{coll}^{central}} \frac{1/(2 \pi p_T) d^2 N^{central} / dp_T dy}{1/(2 \pi p_T) d^2 N^{peripheral} / dp_T dy}
+R_{CP} = \frac{N_{coll}^{peripheral}}{N_{coll}^{central}} \frac{1/(2 \pi p_T) d^2 N^{central} / dp_T dy}{1/(2 \pi p_T) d^2 N^{peripheral} / dp_T dy}
 ```
 
 Where 
