@@ -18,7 +18,7 @@ find_package(ROOT QUIET)
 if(${ROOT_FOUND}) # checking via cmake
    message(STATUS "ROOT package found: ${ROOT_USE_FILE}")
    link_libraries(${ROOT_LIBRARIES})
-   set(CMAKE_CXX_STANDARD ${ROOT_CXX_STANTARD})
+   set(CMAKE_CXX_STANDARD ${ROOT_CXX_STANDARD})
 elseif(DEFINED ENV{ROOT_PATH} AND EXISTS "$ENV{ROOT_PATH}/bin/root") #checking via ROOT_PATH
    message(STATUS "ROOT path found: $ENV{ROOT_PATH}")
    set(ROOT_PATH $ENV{ROOT_PATH})
