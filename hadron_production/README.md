@@ -85,7 +85,7 @@ Invariant $p_T$ spectra can be calculated as follows:
 ```
 
 Where 
-- $N_{evt}$ - number of events
+- $N_{evt}$ - number of events (use sum of event weights instead for p+A and A+B)
 - $\Delta y$ - width of a rapidity region
 - $\Delta p_T$ - width of a $p_T$ bin
 - $N(\Delta p_T, \Delta y)$ - multiplicity in a given $p_T$ bin and $\Delta y$ region 
