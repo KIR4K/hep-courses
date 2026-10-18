@@ -92,7 +92,7 @@ Install the needed pdf sets. Edit the configuration of .yaml file in input for y
 You are not integrating for the whole $y_1$ and $y_2$ region for $d \sigma / d p_T$, thus for finite rapidity bins $y_{min} < y_1, y_2 < y_{max}$
 
 ```math
-\frac{d \sigma}{d p_T} \approx \int_{y_{min}}^{y_{max}} \frac{d \sigma}{dp_T dy_1 dy_2} \Delta y_1 \Delta y_2 (Eq.1)
+\frac{d \sigma}{d p_T} \approx \frac{1}{\Delta y_1 \Delta y_2} \int_{y_{min}}^{y_{max}} \frac{d \sigma}{dp_T dy_1 dy_2} dy_1 dy_2 \ \ (Eq.1)
 ```
 
 Where $\Delta y_1$, $\Delta y_2$ - kinematic regions of $y_1$ and $y_2$. This kinematic region may not equal to $y_{max} - y_{min}$ due to kinematic constrains for the given $p_T$. Therefore you have to determine $\Delta y_1$ and $\Delta y_2$.
