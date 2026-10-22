@@ -3,7 +3,7 @@
 #  @file  ndim_integration.py
 #  @brief Contains a simple example that shows how N-dimensional integration can be performed with the use of python vegas library
 #
-#  This file is a part of a repository hep-courses (https://github.com/Sergeyir/hep-courses/jets3).
+#  This file is a part of a repository hep-courses (https://github.com/Sergeyir/hep-courses).
 #
 #  @author Sergei Antsupov (antsupov0124@gmail.com)
 

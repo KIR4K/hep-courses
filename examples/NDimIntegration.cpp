@@ -4,7 +4,7 @@
  *
  *  Use ROOT cling to run: root NDimIntegration.cpp
  *
- *  This file is a part of a repository hep-courses (https://github.com/Sergeyir/hep-courses/jets3).
+ *  This file is a part of a repository hep-courses (https://github.com/Sergeyir/hep-courses).
  *
  *  @author Sergei Antsupov (antsupov0124@gmail.com)
  **/
