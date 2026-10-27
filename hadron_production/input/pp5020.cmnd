@@ -1,0 +1,10 @@
+! System: pp5020
+SoftQCD:nonDiffractive = on
+! Collision and beam parameters
+Beams:idA = 2212
+Beams:idB = 2212
+Beams:eCM = 5020.
+
+! PDF selection
+PDF:pSet = LHAPDF6:NNPDF40_lo_as_01180
+PDF:pSetB = LHAPDF6:NNPDF40_lo_as_01180

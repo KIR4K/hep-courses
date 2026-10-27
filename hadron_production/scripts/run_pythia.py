@@ -8,6 +8,19 @@ import ROOT
 
 import pythia8
 
+def get_system_name(cmnd_file_path: str) -> str:
+    """
+    Читает .cmnd файл и ищет строку вида '! System: <name>'.
+    Возвращает <name> (например, 'pp5020', 'pPb5020', 'PbPb5020').
+    Если строка не найдена, возвращает 'unknown'.
+    """
+    with open(cmnd_file_path, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if line.startswith("! System:"):
+                return line.split(":", 1)[1].strip()
+    return "unknown"
+
 def run_pythia(input_file_name : str, n_events : int) -> int :
 
     # checking if specified input file exists
@@ -40,78 +53,104 @@ def run_pythia(input_file_name : str, n_events : int) -> int :
     # uncomment the next line if you do not need for pythia to print event info and banner
     # pythia.readString("Print:quiet = on")
 
-    # initializing pythia; this step pythia applies parameters we set earlier and 
+    # initializing pythia; this step pythia applies parameters we set earlier and
     # checks if there are problems with the current specification
+        # initializing pythia
     pythia.init()
+
+    sigma_tot = pythia.infoPython().sigmaGen()
+
+    print(f"\033[1;32m[INFO]\033[0m Total cross section: {sigma_tot:.4f} mb")
 
     # creating directory in which the file outputFile will be written
     os.makedirs("output", exist_ok=True)
-    # file in which all histogram will be written; the following line will create 
-    # (overwrite if exists) the file output/generated.root and root will point to it
-    # so that TObject objects can be written in it by using method TObject::Write()
-    # To do: come up with idea on how to set unique names for output files, so that each 
-    # calculation of different collision systems would not overwrite the same file
-    # Hint: you can append unique system identifier to the file 
-    # (for example by setting a unique comment in .cmnd file, then extracting its contents
-    # with open() and read() function, and finally appending to the output TFile name)
-    output_file = ROOT.TFile("output/pp.root", "RECREATE")
+
+    # Получаем уникальное имя системы из .cmnd файла
+    system_name = get_system_name(input_file_name)
+    print(f"\033[1;32m[INFO]\033[0m Detected system: {system_name}")
+
+    output_file = ROOT.TFile(f"output/{system_name}.root", "RECREATE")
     # if another file is created after this with option "RECREATE", "UPDATE", or "CREATE"
     # root will try to write TObject objects to the new defined file
-    # if you have multiple TFile files you write in in yor program use 
+    # if you have multiple TFile files you write in in yor program use
     # TFile::cd() to point root to the file you need
 
-    # To do: declare histograms to store numner of event charged particles multiplicity an
-    # pT multiplicity vs number of charged particles
-    # 1-D histograms: https://root.cern.ch/doc/master/classTH1.html
-    # 2-D histograms: https://root.cern.ch/doc/master/classTH2.html
+    # To do: declare histograms to store number of event charged particles multiplicity
+    # and pT multiplicity vs number of charged particles
 
+    # 1D гистограмма для множественности заряженных частиц (N_ch) в forward-области
+    # Диапазон 0-300 подобран с запасом для pp, для PbPb может потребоваться больше
+    hist_nch = ROOT.TH1D("N_ch", ";N_{ch};Events", 300, 0., 300.)
+
+    # 2D гистограмма: pT частицы vs N_ch события
+    # Ось X - pT (0-25 ГэВ), Ось Y - N_ch (0-300)
+    hist_pt_vs_nch = ROOT.TH2D("pT_vs_Nch", ";p_{T} [GeV/c];N_{ch}",
+                            250, 0., 25.,
+                            300, 0., 300.)
+
+    # 1D гистограмма для спектра pT протонов/антипротонов (для варианта 4)
+    hist_pt_proton = ROOT.TH1D("pT_proton", ";p_{T} [GeV/c];Counts",
+                           250, 0., 25.)
     # example: pT multiplicity
     hist_pt = ROOT.TH1D("pT multiplicity", "", 200, 0., 25.)
 
-    # iterating over all events
-    for i in range(n_events) :
+    # Получаем полное сечение (в мб) после инициализации для последующей нормировки
+    #sigma_tot = pythia.infoPython().sigmaGen()
 
-        # this tells pythia to generate next event
-        # skipping if problems occur
-        if not pythia.next() :
+    # Сохраняем сечение в файл как однобинную гистограмму для удобного чтения в analyze_output.py
+    hist_sigma = ROOT.TH1D("sigma_tot", "Total cross section [mb]", 1, 0., 1.)
+    hist_sigma.SetBinContent(1, sigma_tot)
+    hist_sigma.Write()
+
+    # Итерируемся по событиям
+    for i in range(n_events):
+        if not pythia.next():
             continue
 
-        # to get information on cross sections, weights, etc. use info on
-        # https://pythia.org/latest-manual/CrossSectionsAndWeights.html
-
-        # weight for the current event
         eventWeight = pythia.infoPython().weight()
 
-        # Exercise: Can you determine whether the event weight is needed and why?
+        # 1. Считаем N_ch в forward-области (2.8 < |eta| < 5.1) для определения центральности
+        n_ch = 0
+        for j in range(pythia.event.size()):
+            particle = pythia.event[j]
+            # Проверяем, что частица конечная и заряженная
+            if particle.isFinal() and particle.isCharged():
+                eta = abs(particle.eta())
+                if 2.8 < eta < 5.1:
+                    n_ch += 1
 
-        # to get information of a pythia event you can use info on
-        # https://pythia.org/latest-manual/EventRecord.html
+        # Заполняем 1D гистограмму множественности для этого события
+        hist_nch.Fill(n_ch, eventWeight)
 
-        # iterating over all particles in a current event
-        for j in range(pythia.event.size()) :
+        # 2. Ищем протоны и антипротоны (Вариант 4) в центральной области (|eta| < 1)
+        for j in range(pythia.event.size()):
+            particle = pythia.event[j]
+            pid = particle.id()
 
-            # to get information of a particle you can use info on 
-            # https://pythia.org/latest-manual/ParticleProperties.html
+            # Проверяем, что это протон (2212) или антипротон (-2212), и что она конечная
+            if particle.isFinal() and abs(pid) == 2212:
+                eta = abs(particle.eta())
+                if eta < 1.0:
+                    pt = particle.pT()
+                    # Заполняем 1D спектр (сумма p и p~)
+                    hist_pt_proton.Fill(pt, eventWeight)
+                    # Заполняем 2D гистограмму: pT (ось X) vs N_ch (ось Y)
+                    hist_pt_vs_nch.Fill(pt, n_ch, eventWeight)
 
-            # prints particle id (more info on id: 
-            # https://pdg.lbl.gov/2007/reviews/montecarlorpp.pdf)
-            
-            # printing id of particles in a first event (as an example)
-            if (i == 0) :
-                print(pythia.event[j].id())
+        # Печатаем прогресс раз в 1000 событий, чтобы не спамить в консоль
+        if i % 1000 == 0 and i > 0:
+            print(f"Processed {i} events.")
 
-            hist_pt.Fill(pythia.event[j].pT(), eventWeight)
+    # Масштабируем гистограмму протонов на 1/2, так как по заданию нужно (p + p~)/2
+    hist_pt_proton.Scale(0.5)
 
-    # printing cross section (Can you deduce what the unit of measurement for this quantity is?)
-    print(pythia.infoPython().sigmaGen())
+    # Записываем все гистограммы в файл
+    hist_nch.Write()
+    hist_pt_vs_nch.Write()
+    hist_pt_proton.Write()
+    # hist_pt.Write() # Можно оставить раскомментированным для отладки, если нужен спектр всех частиц
 
-    hist_pt.Write()
-
-    # closing file; this is not required in the current case, however in a general case
-    # it is better to close files when you are done working with them 
-    # so that there are no unintended writes/reads or assignment TObject file ownership
     output_file.Close()
-
     return 0
 
 if __name__ == "__main__" :

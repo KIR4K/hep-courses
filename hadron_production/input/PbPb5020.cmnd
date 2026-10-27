@@ -1,0 +1,13 @@
+! System: PbPb5020
+HeavyIon:mode = 1
+SoftQCD:nonDiffractive = on
+
+! Collision and beam parameters
+Beams:idA = 1000822080
+Beams:idB = 1000822080
+Beams:eA = 522080.
+Beams:eB = 522080.
+
+! PDF selection
+PDF:pSet = LHAPDF6:nCTEQ15FullNuc_208_82
+PDF:pSetB = LHAPDF6:nCTEQ15FullNuc_208_82
