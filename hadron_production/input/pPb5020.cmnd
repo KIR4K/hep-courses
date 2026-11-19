@@ -1,11 +1,16 @@
 ! System: pPb5020
+HeavyIon:mode = 1
 SoftQCD:nonDiffractive = on
-! Collision and beam parameters
+
 Beams:idA = 2212
 Beams:idB = 1000822080
-Beams:eA = 4000.
-Beams:eB = 327600.
+Beams:frameType = 2
+Beams:eA = 4000.      ! proton beam energy
+Beams:eB = 1575.      ! Pb per-nucleon energy -> sqrt(s_NN) = 5020 GeV
 
-! PDF selection
-PDF:pSet = LHAPDF6:NNPDF40_lo_as_01180
+PDF:pSet  = LHAPDF6:NNPDF40_lo_as_01180
 PDF:pSetB = LHAPDF6:nCTEQ15FullNuc_208_82
+
+HeavyIon:SigFitNGen = 0
+HeavyIon:SigFitDefAvNDb = 1.13
+HeavyIon:SigFitDefPar = 1.57,13.35,0.18

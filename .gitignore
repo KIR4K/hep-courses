@@ -1,4 +1,3 @@
-output/
 bin/
 lib/
 backup/
@@ -14,7 +13,6 @@ __*
 *.tmp
 *.log
 *.swp
-*.root
 *.png
 *.backup
 *.o
