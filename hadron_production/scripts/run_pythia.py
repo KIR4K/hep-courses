@@ -32,8 +32,6 @@ def run_pythia(input_file_name: str, n_events: int, seed: int) -> int:
     pythia.readString("Print:quiet = on")
 
     # ---------- defaults (can be overridden by .cmnd) ----------
-    # HardQCD needed for pT > ~3 GeV part of the spectrum
-    pythia.readString("HardQCD:all = on")
     # MB baseline (elastic/diffractive not needed for central analysis)
     pythia.readString("SoftQCD:nonDiffractive = on")
     # CRITICAL: cut the 1/pT^4 divergence. Task requires pTHatMin = 3 GeV.
